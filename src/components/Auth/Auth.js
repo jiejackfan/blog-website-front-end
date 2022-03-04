@@ -1,31 +1,43 @@
 import React, {useState} from 'react'
-import {Avatar, Button, Paper, Grid, Typography, Container, TextField} from '@material-ui/core'
+import {Avatar, Button, Paper, Grid, Typography, Container} from '@material-ui/core'
 import useStyles from './styles'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Input from './Input';
 import {GoogleLogin} from 'react-google-login';
 import Icon from './icon'
 import {useDispatch} from 'react-redux';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import {signin, signup} from '../../actions/auth'
+
+const initialState = {
+    firstName:'', lastName:'', email:'', password:'', confirmPassword:'',
+}
 
 const Auth = () => {
     const classes = useStyles();
     const [isSignUp, setIsSignUp] = useState(false);
+    const [formData, setFormData] = useState(initialState);
+    const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const history = useNavigate();
-    const handleSubmit = () => {
-
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isSignUp) {
+            dispatch(signup(formData, history));
+        } else {
+            dispatch(signin(formData, history));
+        }
     }
 
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+        setFormData({...formData, [e.target.name]:e.target.value});
     }
 
     const handleShowPassword = () => setShowPassword((prevShowPassword)=> !prevShowPassword);
 
     const switchMode = () => {
         setIsSignUp((prevIsSignUp) => !prevIsSignUp);
-        handleShowPassword(false);
+        setShowPassword(false);
     }
 
     const googleSuccess = async (res) => {
@@ -43,7 +55,6 @@ const Auth = () => {
         console.log("Google Sign In was unsuccessful")
     }
 
-    const [showPassword, setShowPassword] = useState(false);
     return (
         <Container component='main' maxWidth='xs'>
             <Paper className={classes.paper} elevation={3}>
